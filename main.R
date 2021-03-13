@@ -161,26 +161,26 @@ install.packages("Rtsne")
 library(Rtsne)
 ### 1) tSNE sur IRIS ####
 fit_iris <- Rtsne(valeurs,               # données
-             pca = FALSE,           # initialisation
-             perplexity = 30,       # paramètre à regler
-             theta = 0.0)           # acceleration de l'algorithme
+                  pca = FALSE,           # initialisation
+                  perplexity = 30,       # paramètre à regler
+                  theta = 0.0)           # acceleration de l'algorithme
 print(fit_iris)
 plot(fit_iris$Y, col = etiquettes, pch = 19)
 
 ### 2) tSNE sur swissRoll ####
 fit_swissroll <- Rtsne(swissroll,               # données
-             pca = FALSE,           # initialisation
-             perplexity = 100,       # paramètre à regler
-             theta = 0.0)           # acceleration de l'algorithme
+                       pca = FALSE,           # initialisation
+                       perplexity = 100,       # paramètre à regler
+                       theta = 0.0)           # acceleration de l'algorithme
 print(fit_swissroll)
 plot(fit_swissroll$Y[order(swissroll[,3]),], col = jet.col(100), pch = 19)
 
 ### 3) tSNE sur helix ####
 set.seed(1)
 fit_helix <- Rtsne(helix,               # données
-                            pca = FALSE,           # initialisation
-                            perplexity = 30,       # paramètre à regler
-                            theta = 0.0, # acceleration de l'algorithme
+                   pca = FALSE,           # initialisation
+                   perplexity = 30,       # paramètre à regler
+                   theta = 0.0, # acceleration de l'algorithme
                    check_duplicates = FALSE)           
 print(fit_helix)
 plot(fit_helix$Y, col = jet.col(100), pch = 19)
@@ -189,24 +189,24 @@ fit_helix_in_torus <- Rtsne(helix_in_torus,               # données
                             pca = FALSE,           # initialisation
                             perplexity = 50,       # paramètre à regler
                             theta = 0.0,
-             check_duplicates = FALSE)           # acceleration de l'algorithme
+                            check_duplicates = FALSE)           # acceleration de l'algorithme
 print(fit_helix_in_torus)
 plot(fit_helix_in_torus$Y[order(helix_in_torus[,3]),], col = jet.col(100), pch = 19)
 
 ### 5) t-SNE sur un échantillon de 1000 images de MNIST ####
 fit_MNIST <- Rtsne(all,               # données
-                            pca = FALSE,           # initialisation
-                            perplexity = 30,       # paramètre à regler
-                            theta = 0.0,
-                            check_duplicates = FALSE) 
-print(fit_MNIST)fl
-plot(fit_MNIST$Y, color = rainbow(n), pch = 19)
-### 6) t-SNE sphere ####
-fit_sphere <- Rtsne(sphere,               # données
                    pca = FALSE,           # initialisation
                    perplexity = 30,       # paramètre à regler
                    theta = 0.0,
                    check_duplicates = FALSE) 
+print(fit_MNIST)fl
+plot(fit_MNIST$Y, color = rainbow(n), pch = 19)
+### 6) t-SNE sphere ####
+fit_sphere <- Rtsne(sphere,               # données
+                    pca = FALSE,           # initialisation
+                    perplexity = 30,       # paramètre à regler
+                    theta = 0.0,
+                    check_duplicates = FALSE) 
 print(fit_sphere)
 plot(fit_sphere$Y, col = rainbow(n), pch = 19)
 # III. Comparaison méthodes de réduction de dimension ####
@@ -342,7 +342,7 @@ for(x in dimRedQualityList()[-(7:8)]){
   print(paste("kPCA : ", res))
 }
 
-#coranking
+#coranking ####
 coranking_analysis <- function(dataset, data_emb_method){
   Q = coranking(
     dataset@data,
@@ -375,34 +375,35 @@ corank_analysis_methods(data_helix, data_emb_helix)
 corank_analysis_methods(data_sphere, data_emb_sphere)
 # coraning mnist
 corank_analysis_methods(all, data_emb_mnsit)
-coranking_analysis_mnist <- function(dataset, data_emb_method){
-  Q = coranking(
-    dataset,
-    data_emb_method@data@data,
-    input_Xi = "data",
-    input_X = "data",
-    use = "C"
-  )
-  imageplot(
-    Q = Q,
-    lwd = 2,
-    bty = "n",
-    main = "co-ranking matrix",
-    xlab = expression(R),
-    ylab = expression(Ro),
-    col = colorRampPalette(colors = c("gray85", "red", "yellow", "green", "blue"))(100),
-    axes = FALSE,
-    legend = TRUE,
-  )
+#coranking_analysis_mnist <- function(dataset, data_emb_method){
+Q = coranking(
+  dataset,
+  data_emb_method@data@data,
+  input_Xi = "data",
+  input_X = "data",
+  use = "C"
+)
+imageplot(
+  Q = Q,
+  lwd = 2,
+  bty = "n",
+  main = "co-ranking matrix",
+  xlab = expression(R),
+  ylab = expression(Ro),
+  col = colorRampPalette(colors = c("gray85", "red", "yellow", "green", "blue"))(100),
+  axes = FALSE,
+  legend = TRUE,
+)
 }
-corank_analysis_methods_mnist <- function(dataset, data_emb){
-  data_emb_methods = c(data_emb$tSNE, data_emb$LLE, data_emb$kPCA)
-  lapply(data_emb_methods, function(x) coranking_analysis_mnist(dataset, x))
+#corank_analysis_methods_mnist <- function(dataset, data_emb){
+data_emb_methods = c(data_emb$tSNE, data_emb$LLE, data_emb$kPCA)
+lapply(data_emb_methods, function(x) coranking_analysis_mnist(dataset, x))
 }
-corank_analysis_methods_mnist(all, data_emb_mnsit)
+#corank_analysis_methods_mnist(all, data_emb_mnsit)
 
+mode(all) = "double"
 Q_mnist_tsne = coranking(
-  double(all),
+  all,
   data_emb_mnsit$tSNE@data@data,
   input_Xi = "data",
   input_X = "data",
@@ -423,19 +424,17 @@ Q_mnist_kpca = coranking(
   use = "C"
 )
 vect_Q_mnist = c(Q_mnist_tsne, Q_mnist_lle, Q_mnist_kpca )
-plot_corank= function(vect_Q_mnist){
-  for(Q in vect_Q_mnist){
-    imageplot(
-      Q = Q,
-      lwd = 2,
-      bty = "n",
-      main = "co-ranking matrix",
-      xlab = expression(R),
-      ylab = expression(Ro),
-      col = colorRampPalette(colors = c("gray85", "red", "yellow", "green", "blue"))(100),
-      axes = FALSE,
-      legend = TRUE,
-    )
-  }
+for(Q in vect_Q_mnist){
+  imageplot(
+    Q = Q,
+    lwd = 2,
+    bty = "n",
+    main = "co-ranking matrix",
+    xlab = expression(R),
+    ylab = expression(Ro),
+    col = colorRampPalette(colors = c("gray85", "red", "yellow", "green", "blue"))(100),
+    axes = FALSE,
+    legend = TRUE,
+  )
 }
-plot_corank(vect_Q_mnist)
+
