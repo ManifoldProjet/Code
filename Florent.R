@@ -3,6 +3,10 @@ install.packages("dimRed")
 install.packages("coRanking")
 install.packages('optimx')
 install.packages('energy')
+install.packages("rgl")
+install.packages("ggm")
+BiocManager::install("graph")
+install.packages("BiocManager")
 library(optimx)
 library(energy)
 library(rgl) 
@@ -12,6 +16,9 @@ library(rgl)
 library(Rtsne)
 library(dimRed)
 library(coRanking)
+library(BiocManager)
+library(ggm)
+library(rgl)
 # I. Datasets ####
 ## I.A. Datasets synthétiques ####
 ### 1) swiss roll ####
@@ -25,8 +32,6 @@ x <- -cos(v) * v
 y <- 20 * u[, 2]
 z <- sin(v) * v
 swissroll <- cbind(x, y , z)
-plot3d(swissroll[order(v), ], col = rainbow(n), size = 10)
-#http://www.sthda.com/english/wiki/impressive-package-for-3d-and-4d-graph-r-software-and-data-visualization
 scatter3D(x,y,z, theta = 15, phi = 20, bty = "g",
           pch = 20, cex = 2, ticktype = "detailed")
 
@@ -53,33 +58,18 @@ b=1
 x=(a + (b * cos(u)) ) * cos(v) 
 y=(a + (b * cos(u)) ) * sin(v) 
 z= (b * sin(u)) 
-#labels
-print(length(z))
-print(length(z[z<0.5]))
 
 scatter3D(x,y,z, theta = 100, phi = 30, bty = "g",
           pch = 20, cex = 2, ticktype = "detailed")
-scatter3D(x,y,z, theta = 100, phi = 100, bty = "g",
-          pch = 20, cex = 2, ticktype = "detailed")
 helix_in_torus <- cbind(x, y, z)
-### 3) Sphere Thomas ####
+### 3) Sphere ####
 #hypersphere
-install.packages("BiocManager")
-library(BiocManager)
-BiocManager::install("graph")
-install.packages("ggm")
-library("ggm")
-install.packages("rgl")
-library(rgl)
+
 n <- 1000
 sphere <- rsphere(n,3)
-#plot3d(sphere[order(sphere[,1]),],col = rainbow(n))
-#plot3D(sphere[order(sphere[,1]),],col = rainbow(n))
-#scatter3D(sphere[order(sphere[,1]),],col = rainbow(n))
-#scatter3D(sphere,col = rainbow(n))
 ## I.B. Datasets IRL ####
 ### 1) Mnist #### 
-setwd("~/Documents/Manifold Learning/Manifold_Projet/Manifold_Learning_Projet")
+#setwd("~/Documents/Manifold Learning/Manifold_Projet/Manifold_Learning_Projet")
 all    <- as.matrix(read.table("data.txt"))
 labels <- read.table("labels.txt", colClasses = 'integer')
 # II. Algorithmes ####
@@ -207,34 +197,7 @@ corank_analysis_methods(data_swissroll, data_emb_swiss)
 corank_analysis_methods(data_helix, data_emb_helix)
 ### coranking sphere ####
 corank_analysis_methods(data_sphere, data_emb_sphere)
-### coraning mnist ####
-corank_analysis_methods(all, data_emb_mnsit)
-coranking_analysis_mnist <- function(dataset, data_emb_method){
-  Q = coranking(
-    dataset,
-    data_emb_method@data@data,
-    input_Xi = "data",
-    input_X = "data",
-    use = "C"
-  )
-  imageplot(
-    Q = Q,
-    lwd = 2,
-    bty = "n",
-    main = "co-ranking matrix",
-    xlab = expression(R),
-    ylab = expression(Ro),
-    col = colorRampPalette(colors = c("gray85", "red", "yellow", "green", "blue"))(100),
-    axes = FALSE,
-    legend = TRUE,
-  )
-}
-corank_analysis_methods_mnist <- function(dataset, data_emb){
-  data_emb_methods = c(data_emb$tSNE, data_emb$LLE, data_emb$kPCA)
-  lapply(data_emb_methods, function(x) coranking_analysis_mnist(dataset, x))
-}
-corank_analysis_methods_mnist(all, data_emb_mnsit)
-
+### coranking mnist ####
 mode(all) = "double"
 Q_mnist_tsne = coranking(
   all,
@@ -271,11 +234,8 @@ for(Q in vect_Q_mnist){
     legend = TRUE,
   )
 }
-## III.B. Q_global et Q_local (Cintia) ####
-## III.C. AUC + Cophenetic correlation (Thomas) ####
-## III.D. Reconstruction error Bonus####
+## III.B calcul critères de qualité ####
 
-#  calcul critères de qualité #### 
 calcul_quality = function(emb_data){
   for(emb in emb_data){
     print(emb)
@@ -302,6 +262,7 @@ calcul_quality_mnist = function(emb_data){
 
 calcul_quality(data_emb_swiss)
 calcul_quality(data_emb_helix)
+calcul_quality(data_emb_sphere)
 calcul_quality(data_emb_sphere)
 calcul_quality_mnist(data_emb_mnsit)
 
