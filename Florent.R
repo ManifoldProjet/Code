@@ -3,8 +3,6 @@ install.packages("dimRed")
 install.packages("coRanking")
 install.packages('optimx')
 install.packages('energy')
-install.packages("Rtsne")
-install.packages('lle') 
 library(optimx)
 library(energy)
 library(rgl) 
@@ -12,7 +10,6 @@ library(vegan)
 library(plot3D)
 library(rgl)
 library(Rtsne)
-library(lle)
 library(dimRed)
 library(coRanking)
 # I. Datasets ####
@@ -82,8 +79,8 @@ sphere <- rsphere(n,3)
 #scatter3D(sphere,col = rainbow(n))
 ## I.B. Datasets IRL ####
 ### 1) Mnist #### 
-setwd("/Users/flore/Documents/Cours/manifold/projet/Code")
-all    <- as.matrix(read.table('data.txt'))
+setwd("~/Documents/Manifold Learning/Manifold_Projet/Manifold_Learning_Projet")
+all    <- as.matrix(read.table("data.txt"))
 labels <- read.table("labels.txt", colClasses = 'integer')
 # II. Algorithmes ####
 ## II.A. KACP (Cintia) ####
@@ -159,7 +156,7 @@ library(dimRed)
 library(coRanking)
 ## load test data set
 data_swissroll <- loadDataSet("Swiss Roll", n = 1000)
-data_helix <- loadDataSet("Helix", n = 1000)
+data_helix <- loadDataSet("helix", n = 1000)
 data_sphere <- loadDataSet("Sphere", n = 1000)
 RDD_apply <- function(dataset){
   embed_methods <- c("tSNE", "LLE", "kPCA")
@@ -167,7 +164,7 @@ RDD_apply <- function(dataset){
   data_emb <- lapply(embed_methods, function(x) embed(dataset, x))
   names(data_emb) <- embed_methods
   ## figure \ref{fig:plotexample}a, the data set
-  plot(dataset, type = "3vars")
+  #plot(dataset, type = "3vars")
   ## figures \ref{fig:plotexample}b (Isomap) and \ref{fig:plotexample}d (PCA)
   lapply(data_emb, plot, type = "2vars")
   ## figure \ref{fig:plotexample}c, quality analysis
@@ -278,6 +275,34 @@ for(Q in vect_Q_mnist){
 ## III.C. AUC + Cophenetic correlation (Thomas) ####
 ## III.D. Reconstruction error Bonus####
 
+#  calcul critères de qualité #### 
+calcul_quality = function(emb_data){
+  for(emb in emb_data){
+    print(emb)
+    for (q in dimRedQualityList()[-c(7,8)] ){
+      print(q)
+      res = quality( emb , q)
+      print(res)
+    }
+  }
+  
+}
+calcul_quality_mnist = function(emb_data){
+  for(emb in emb_data){
+    print(emb)
+    for (q in dimRedQualityList()[-c(5,7,8)] ){
+      print(q)
+      res = quality( emb , q)
+      print(res)
+    }
+  }
+  
+}
 
 
+calcul_quality(data_emb_swiss)
+calcul_quality(data_emb_helix)
+calcul_quality(data_emb_sphere)
+calcul_quality_mnist(data_emb_mnsit)
 
+                    
